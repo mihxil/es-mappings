@@ -91,44 +91,48 @@ function put() {
         done
     fi
 
-    ## Now aliases
-    publishalias='{"actions": ['
-    if [ $number -gt 0 ] ; then
-        # updating an index. Remove the exstign publish alias
-        # remove publish alias
-        publishalias="$publishalias
+    if [ "$number" != ""] ; then
+        ## Now aliases
+        publishalias='{"actions": ['
+        if [ $number -gt 0 ] ; then
+            # updating an index. Remove the exsting publish alias
+            # remove publish alias
+            publishalias="$publishalias
         {
          \"remove\": {
            \"alias': \"$basename-publish\",
            \"index\": \"$previndex\"
          }},"
-    else
-        # completely new index. Create also an api alias
-        publishalias="$publishalias
+        else
+            # completely new index. Create also an api alias
+            publishalias="$publishalias
         {
 
             \"add\": {
               \"alias\": \"$basename\",
               \"index\": \"$destindex\"
          }},"
-    fi
-    # Create a publish alias for the new index in any case
-    publishalias="$publishalias
+        fi
+        # Create a publish alias for the new index in any case
+        publishalias="$publishalias
   {
 
             \"add\": {
               \"alias\": \"$basename-publish\",
               \"index\": \"$destindex\"
          }}]}"
-    echo $publishalias
-    curl -XPOST -H'content-type: application/json'  $desthost/_aliases -d "$publishalias"
+        echo $publishalias
+        curl -XPOST -H'content-type: application/json'  $desthost/_aliases -d "$publishalias"
 
-    reindex="{
+        reindex="{
         \"source\": { \"index\": \"$previndex\" },
         \"dest\": { \"index\": \"$destindex\" }
      }"
-    echo curl -XPOST $desthost/_reindex -d "\"$reindex\""
+        echo curl -XPOST $desthost/_reindex -d "\"$reindex\""
+    fi
 
+
+    #TODOXS
 # Copy index
   echo
   echo "WARNING: You should execute this command to copy old to new index"
