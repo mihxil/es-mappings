@@ -91,7 +91,11 @@ function put() {
         done
     fi
 
-    if [ "$number" != ""] ; then
+    if [ "$number" == "" ] ; then
+        echo "Updating existing index. No aliases, not reindexing needed"
+    else
+        echo "For number $number"
+        exit
         ## Now aliases
         publishalias='{"actions": ['
         if [ $number -gt 0 ] ; then
@@ -128,16 +132,12 @@ function put() {
         \"source\": { \"index\": \"$previndex\" },
         \"dest\": { \"index\": \"$destindex\" }
      }"
-        echo curl -XPOST $desthost/_reindex -d "\"$reindex\""
-    fi
 
-
-    #TODOXS
-# Copy index
-  echo
-  echo "WARNING: You should execute this command to copy old to new index"
-  echo "Execute this command:"
-  reindex="{
+        # Copy index
+        echo
+        echo "WARNING: You should execute this command to copy old to new index"
+        echo "Execute this command:"
+        reindex="{
     \"source\": {
       \"index\": \"$previndex\"
       },
@@ -146,28 +146,27 @@ function put() {
       }
      }"
 
-  echo curl -XPOST $desthost/_reindex -d "'$reindex'"
-#End copy index
+        echo curl -XPOST $desthost/_reindex -d "'$reindex'"
+        #End copy index
 
-#Start move apimedia (read) alias
-  echo
-  echo "WARNING: See command before! Once the index is copied you can move the alias."
-  echo "Execute this command:"
-   alias="{
+        #Start move apimedia (read) alias
+        echo
+        echo "WARNING: See command before! Once the index is copied you can move the alias."
+        echo "Execute this command:"
+        alias="{
     \"actions\": [
             { \"remove\": {
-                \"alias\": \"apimedia\",
+                \"alias\": \"$basename\",
                 \"index\": \"$previndex\"
             }},
             { \"add\": {
-                \"alias\": \"apimedia\",
+                \"alias\": \"$basename\",
                 \"index\": \"$destindex\"
             }}
         ]
     }"
-   echo curl -XPOST $desthost/_aliases -d "'$alias'"
-
-#End move apimedia
+        echo curl -XPOST $desthost/_aliases -d "'$alias'"
+   fi
 
 
 
