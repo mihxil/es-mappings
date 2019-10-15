@@ -13,9 +13,9 @@ function _init() {
     then
         echo "Usage $0 <es-url> [<index number>|<alias>]"
         echo "index number:  Number of the new index to create (e.g. 2 in $basename-2). If omitted the mappings are put over the old ones (only possible if they are compatible)"
-        echo "Each index has 2 aliases: $basename (read) $basenamea-publish (write)."
+        echo "Each index has 2 aliases: $basename (read) $basename-publish (write)."
         echo "This script will create a new index and point the publisher to it."
-        echo "You will have to manually move the apimedia after you copied the index"
+        echo "You will have to manually move the $basename after you copied the index"
         exit
     fi
     desthost=${commandline_args[0]}
@@ -53,9 +53,10 @@ function put() {
     shift
     echo "Echo putting $basedir to $desthost/$destindex"
     local arr=("$@")
-    rm $destindex.json
-    echo '{' > $destindex.json
+
     if [ "$needssettings" = true ]; then
+        rm $destindex.json
+        echo '{' > $destindex.json
         echo "putting settings"
         echo '"settings":' >> $destindex.json
         settingfile=$basedir/setting/$basename.json
